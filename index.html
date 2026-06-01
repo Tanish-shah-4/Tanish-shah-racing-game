@@ -4,1046 +4,1071 @@ This is a template student's can copy to get started on their JavaScript Challen
 -->
 <html>
 
-<head>
-    <title>Tanish Shah Racing Game</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        canvas {
-            padding-left: 0;
-            padding-right: 0;
-            margin-left: auto;
-            margin-right: auto;
-            display: block;
-            width: 800px;
-        }
+    <head>
+        <title>Tanish Shah Racing Game</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            canvas {
+                padding-left: 0;
+                padding-right: 0;
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+                width: 800px;
+            }
 
-        p {
-            text-align: center;
-            font-family: 'Arial';
-            font-size: larger;
-            font-style: oblique;
-            font-weight: bold;
-        }
-    </style>
-</head>
+            p {
+                text-align: center;
+                font-family: 'Arial';
+                font-size: larger;
+                font-style: oblique;
+                font-weight: bold;
+            }
+        </style>
+    </head>
 
-<body>
-    <div>
-
-
-    </div>
+    <body>
+        <div>
 
 
-    <canvas id="canvas" width="800" height="600" style="border:1px white" tabindex="1"></canvas>
+        </div>
 
 
-
-
-    <script>
-
-        //======================GLOBAL VARIABLES============================
-        //can be used in all functions
-
-        //these ones are used for drawing
-        var drawer; //the thing we draw on
-        var WIDTH; //canvas size
-        var HEIGHT;
-        var isMouseDown = false;
-        var gameState = "main menu";
-        var twoWaySign;
-        var oneWaySign;
-        var wKeyImg, aKeyImg, dKeyImg, sKeyImg;
-        var whiteLineMovement = 0;
-        var userCarX = 350;
-        var userCarY = 300;
-        var userCarMovingLeft = false;
-        var userCarMovingRight = false;
-        var userCarMovingUp = false;
-        var userCarMovingDown = false;
+        <canvas id="canvas" width="800" height="600" style="border:1px white" tabindex="1"></canvas>
 
 
 
-        //Used AI help for this to help make arrays of lane positions for the cars to spawn in, this way the cars will always be in a lane and not in the middle of the road
 
-        //These are the x values for the 5 lanes on the road, they can be used to make sure cars are always in a lane
-        var laneChoices = [90, 210, 340, 460, 580];
+        <script>
 
-        var laneChoices2 = [82, 187, 292, 397, 502, 607];
+            //======================GLOBAL VARIABLES============================
+            //can be used in all functions
 
-        var leftLanes = [82, 187, 292];
-        var rightLanes = [397, 502, 607];
-
-        //Used Help from Google AI to make sure that the obstacle cars always spawn in a lane and not in the middle of the road, also used it to make sure that when the cars respawn after going off screen they also spawn in a lane
-        var obstacleCarX = laneChoices[Math.floor(Math.random() * laneChoices.length)];
-        var obstacleCarY = -150;
-
-        var obstacleCar2X = laneChoices[Math.floor(Math.random() * laneChoices.length)];
-        var obstacleCar2Y = -200;
-
-        var obstacleCar3X = laneChoices[Math.floor(Math.random() * laneChoices.length)];
-        var obstacleCar3Y = -350;
-
-        var obstacleCar4X = laneChoices[Math.floor(Math.random() * laneChoices.length)];
-        var obstacleCar4Y = -400;
-
-
-        var twoWayObstacleCarX = laneChoices2[Math.floor(Math.random() * laneChoices2.length)];
-        var twoWayObstacleCarY = -150;
-
-        var twoWayObstacleCar2X = laneChoices2[Math.floor(Math.random() * laneChoices2.length)];
-        var twoWayObstacleCar2Y = -200;
-
-        var twoWayObstacleCar3X = laneChoices2[Math.floor(Math.random() * laneChoices2.length)];
-        var twoWayObstacleCar3Y = 900;
-
-        var twoWayObstacleCar4X = laneChoices2[Math.floor(Math.random() * laneChoices2.length)];
-        var twoWayObstacleCar4Y = 1300;
-
-        //These are the colours that the obstacle cars can be, they are randomly assigned when the cars respawn after going off screen
-        var carColors = ["#ff0000","#0000ff","#00ff00","#ffff00","#ff00ff","#00ffff","#ffffff","#ffa500"];
+            //these ones are used for drawing
+            var drawer; //the thing we draw on
+            var WIDTH; //canvas size
+            var HEIGHT;
+            var isMouseDown = false;
+            var gameState = "main menu";
+            var twoWaySign;
+            var oneWaySign;
+            var wKeyImg, aKeyImg, dKeyImg, sKeyImg;
+            var whiteLineMovement = 0;
+            var userCarX = 350;
+            var userCarY = 300;
+            var userCarMovingLeft = false;
+            var userCarMovingRight = false;
+            var userCarMovingUp = false;
+            var userCarMovingDown = false;
 
 
-        var score = 0; //an be used to track the score of the game, it increases as time goes on
-        //==================================================================
 
-        //======================GAME LOGIC==================================
-        //this function runs once right after the page loads (called at bottom of script)
-        //we can use it to setup starting values for our game
-        function init() {
-            //get the canvas reference from the HTML
-            drawer = document.getElementById('canvas').getContext('2d');
+            //Used AI help for this to help make arrays of lane positions for the cars to spawn in, this way the cars will always be in a lane and not in the middle of the road
 
-            //load images
-            twoWaySign = new Image();
-            twoWaySign.src = "Two way sign.png";
-            oneWaySign = new Image();
-            oneWaySign.src = "One way sign.png";
-            wKeyImg = new Image();
-            wKeyImg.src = "WKeyImg.png";
-            aKeyImg = new Image();
-            aKeyImg.src = "AKeyImg.png";
-            sKeyImg = new Image();
-            sKeyImg.src = "SKeyImg.png";
-            dKeyImg = new Image();
-            dKeyImg.src = "DKeyImg.png";
+            //These are the x values for the 5 lanes on the road, they can be used to make sure cars are always in a lane
+            var laneChoices = [90, 210, 340, 460, 580];
 
-            //store the dimensions which can be used later for things like centering text
-            WIDTH = drawer.canvas.width;
-            HEIGHT = drawer.canvas.height;
+            var laneChoices2 = [82, 187, 292, 397, 502, 607];
+
+            var leftLanes = [82, 187, 292];
+            var rightLanes = [397, 502, 607];
+
+            //Used Help from Google AI to make sure that the obstacle cars always spawn in a lane and not in the middle of the road, also used it to make sure that when the cars respawn after going off screen they also spawn in a lane
 
 
-            //start the main drawing loop
-            requestAnimationFrame(draw);
-        }
+            var obstacleCarX = laneChoices[Math.floor(Math.random() * laneChoices.length)];
+            var obstacleCarY = -150;
+
+            var obstacleCar2X = laneChoices[Math.floor(Math.random() * laneChoices.length)];
+            var obstacleCar2Y = -200;
+
+            var obstacleCar3X = laneChoices[Math.floor(Math.random() * laneChoices.length)];
+            var obstacleCar3Y = -350;
+
+            var obstacleCar4X = laneChoices[Math.floor(Math.random() * laneChoices.length)];
+            var obstacleCar4Y = -400;
 
 
-        //main game loop
-        //runs repeatedly and allows animation
-        function draw() {
-            //start fresh
-            clear();
+            // Left-side cars 
+            var twoWayObstacleCarX = leftLanes[Math.floor(Math.random() * leftLanes.length)];
+            var twoWayObstacleCarY = -150;
+
+            var twoWayObstacleCar2X = leftLanes[Math.floor(Math.random() * leftLanes.length)];
+            var twoWayObstacleCar2Y = -200;
+
+            // Right-side cars 
+            var twoWayObstacleCar3X = rightLanes[Math.floor(Math.random() * rightLanes.length)];
+            var twoWayObstacleCar3Y = 900;
+
+            var twoWayObstacleCar4X = rightLanes[Math.floor(Math.random() * rightLanes.length)];
+            var twoWayObstacleCar4Y = 1300;
+
+            //These are the colours that the obstacle cars can be, they are randomly assigned when the cars respawn after going off screen
+            var carColors = ["#ff0000", "#0000ff", "#00ff00", "#ffff00", "#ff00ff", "#00ffff", "#ffffff", "#ffa500"];
 
 
-            //check the game state and call the appropriate functions to draw the correct screen
-            if (gameState === "main menu") {
+            var score = 0; //an be used to track the score of the game, it increases as time goes on
+            //==================================================================
 
+            //======================GAME LOGIC==================================
+            //this function runs once right after the page loads (called at bottom of script)
+            //we can use it to setup starting values for our game
+            function init() {
+                //get the canvas reference from the HTML
+                drawer = document.getElementById('canvas').getContext('2d');
+
+                //load images
+                twoWaySign = new Image();
+                twoWaySign.src = "Two way sign.png";
+                oneWaySign = new Image();
+                oneWaySign.src = "One way sign.png";
+                wKeyImg = new Image();
+                wKeyImg.src = "WKeyImg.png";
+                aKeyImg = new Image();
+                aKeyImg.src = "AKeyImg.png";
+                sKeyImg = new Image();
+                sKeyImg.src = "SKeyImg.png";
+                dKeyImg = new Image();
+                dKeyImg.src = "DKeyImg.png";
+
+                //store the dimensions which can be used later for things like centering text
+                WIDTH = drawer.canvas.width;
+                HEIGHT = drawer.canvas.height;
+
+
+                //start the main drawing loop
+                requestAnimationFrame(draw);
+            }
+
+
+            //main game loop
+            //runs repeatedly and allows animation
+            function draw() {
+                //start fresh
+                clear();
+
+
+                //check the game state and call the appropriate functions to draw the correct screen
+                if (gameState === "main menu") {
+
+                    startingMessage();
+
+                } else if (gameState === "how to play") {
+
+                    howToPlay();
+
+                } else if (gameState === "second screen") {
+
+                    secondScreen();
+
+                } else if (gameState === "one way screen game") {
+
+                    oneWayScreenGame();
+
+                } else if (gameState === "two way screen game") {
+
+                    twoWayScreenGame();
+
+                } else if (gameState === "game over one way") {
+
+                    gameOver();
+
+                } else if (gameState === "game over two way") {
+
+                    gameOver();
+                }
+
+
+                //TODO CODE MAIN GAME HERE
+                //Some tips:
+                //1. Use functions to break it down
+                //2. Use a game state variable to track what phase the game is in
+                //3. Comment your code as you go along
+                //re run this function (i.e. make it loop)
+                requestAnimationFrame(draw);
+            }
+
+
+
+
+            function startingMessage() {
+
+                //background
+                drawer.fillStyle = "#345299";
+                rect(0, 0, WIDTH, HEIGHT);
+
+
+
+                //Starting Message
+                drawer.fillStyle = "#ffffff";
+                drawer.font = "50px Arial";
+                drawer.fillText("Welcome to Legend Racing", 100, 300);
+
+
+
+                //Click here to begin game button
+                rect(100, 350, 610, 100);
+                drawer.fillStyle = "#000000";
+                drawer.font = "35px Arial";
+                drawer.fillText("Click Here to begin", 258, 410);
+
+
+                //How to play tab
+                drawer.strokeStyle = "#000000";
+                drawer.lineWidth = 5;
+                drawer.fillStyle = "#ffffff";
+                rect(30, 500, 135, 50);
+                drawer.strokeRect(30, 500, 135, 50);
+                drawer.fillStyle = "#000000";
+                drawer.font = "20px Arial";
+                drawer.fillText("How to play", 44, 530);
+
+
+            }
+
+            function secondScreen() {
+
+                //background
+                drawer.fillStyle = "#345299";
+                rect(0, 0, WIDTH, HEIGHT);
+
+                //Two game modes
+                drawer.fillStyle = "#ffffff"
+                rect(150, 200, 200, 200);
+                rect(450, 200, 200, 200);
+                drawer.font = "30px Arial";
+                drawer.fillText("One Way", 190, 435);
+                drawer.fillText("Two Way", 490, 435);
+                drawer.drawImage(twoWaySign, 450, 210, 200, 180);
+                drawer.drawImage(oneWaySign, 150, 210, 200, 180);
+
+                //Go back to starting screen
+                drawer.strokeStyle = "#000000";
+                drawer.lineWidth = 5;
+                rect(20, 20, 150, 50);
+                drawer.strokeRect(20, 20, 150, 50);
+                drawer.fillStyle = "#000000";
+                drawer.font = "20px Arial";
+                drawer.fillText("Back to Menu", 32, 53);
+
+
+            }
+
+
+            function oneWayScreenGame() {
+                //Colour backgroud blue
+                drawer.fillStyle = "#345299";
+                rect(0, 0, WIDTH, HEIGHT);
+
+
+
+                //Background
+                drawer.fillStyle = "#1f8c3c"
+                rect(0, 0, WIDTH, HEIGHT);
+                drawer.fillStyle = "#46484a";
+                rect(75, 0, 630, 600);
+
+
+
+                //White lines on road
+                var whiteLinesY = whiteLineMovement;
+                for (var i = 0; i < 10; i++) {
+
+                    drawer.fillStyle = "#ffffff";
+                    rect(185, whiteLinesY, 20, 50);
+                    rect(315, whiteLinesY, 20, 50);
+                    rect(445, whiteLinesY, 20, 50);
+                    rect(575, whiteLinesY, 20, 50);
+                    whiteLinesY += 100;
+
+
+
+                }
+                //Move the white lines down the screen to create the illusion of movement
+                whiteLineMovement += 5;
+
+                //When the white lines move off the screen, reset them to the top
+                if (whiteLineMovement > 100) {
+                    whiteLineMovement = 0;
+                }
+
+
+                //The user's car
+                userCar("#bbd8ea");
+
+                //Keep the user's car on the road
+                if (userCarX < 75) {
+                    userCarX = 75;
+                }
+                if (userCarX > 625) {
+                    userCarX = 625;
+                }
+                if (userCarY < 0) {
+                    userCarY = 0;
+                }
+                if (userCarY > HEIGHT - 80) {
+                    userCarY = HEIGHT - 80;
+                }
+
+                // car 1
+                obstacleCarY += 5;
+
+                //when car goes off screen, reset it to the top with a random lane
+                if (obstacleCarY > HEIGHT + 50) {
+                    obstacleCarY = -150;
+
+                    // Pick a random lane index from 0 to 4
+                    var pickLane1 = Math.floor(Math.random() * laneChoices.length);
+                    obstacleCarX = laneChoices[pickLane1]; // Assigns the exact lane position
+                }
+
+
+                // car 2
+                obstacleCar2Y += 7;
+
+                if (obstacleCar2Y > HEIGHT + 50) {
+                    obstacleCar2Y = -200;
+
+                    var pickLane2 = Math.floor(Math.random() * laneChoices.length);
+                    obstacleCar2X = laneChoices[pickLane2];
+                }
+
+
+                // car 3
+                obstacleCar3Y += 10;
+
+                if (obstacleCar3Y > HEIGHT + 50) {
+                    obstacleCar3Y = -200;
+
+                    var pickLane3 = Math.floor(Math.random() * laneChoices.length);
+                    obstacleCar3X = laneChoices[pickLane3];
+                }
+
+
+                // car 4
+                obstacleCar4Y += 11;
+
+                if (obstacleCar4Y > HEIGHT + 50) {
+                    obstacleCar4Y = -250;
+
+                    var pickLane4 = Math.floor(Math.random() * laneChoices.length);
+                    obstacleCar4X = laneChoices[pickLane4];
+                }
+
+
+
+
+                //draw obstacle cars
+                obstacleCars(obstacleCarX, obstacleCarY, "#ffffff", false);
+                obstacleCars(obstacleCar2X, obstacleCar2Y, "#ff0000", false);
+                obstacleCars(obstacleCar3X, obstacleCar3Y, "#000000", false);
+                obstacleCars(obstacleCar4X, obstacleCar4Y, "#800080", false);
+
+                //Check collisions
+
+                if (
+                        checkCollision(userCarX, userCarY, obstacleCarX, obstacleCarY) ||
+                        checkCollision(userCarX, userCarY, obstacleCar2X, obstacleCar2Y) ||
+                        checkCollision(userCarX, userCarY, obstacleCar3X, obstacleCar3Y) ||
+                        checkCollision(userCarX, userCarY, obstacleCar4X, obstacleCar4Y)) {
+
+                    gameState = "game over one way";
+                }
+
+
+                //Score increases as time goes on
+                score += 0.1;
+                //Display score
+                scoreTracker();
+
+            }
+
+
+            function twoWayScreenGame() {
+
+                //Colour background blue
+                drawer.fillStyle = "#345299";
+                rect(0, 0, WIDTH, HEIGHT);
+
+                //The back button
+                drawer.strokeStyle = "#000000";
+                drawer.lineWidth = 5;
+                drawer.fillStyle = "#ffffff";
+                rect(20, 20, 150, 50);
+                drawer.strokeRect(20, 20, 150, 50);
+                drawer.fillStyle = "#000000";
+                drawer.font = "20px Arial";
+                drawer.fillText("Back to Menu", 32, 53);
+
+                //Background
+                drawer.fillStyle = "#1f8c3c";
+                rect(0, 0, WIDTH, HEIGHT);
+
+                drawer.fillStyle = "#46484a";
+                rect(75, 0, 630, 600);
+
+                //Yellow road divider
+                drawer.fillStyle = "#ffff00";
+                rect(387, 0, 6, HEIGHT);
+
+                //White lane lines
+                var whiteLinesY = whiteLineMovement;
+
+                for (var i = 0; i < 10; i++) {
+
+                    drawer.fillStyle = "#ffffff";
+
+                    //Draw 4 sets of white lines to divide the lanes
+                    rect(170, whiteLinesY, 15, 50);
+                    rect(275, whiteLinesY, 15, 50);
+                    rect(485, whiteLinesY, 15, 50);
+                    rect(590, whiteLinesY, 15, 50);
+
+                    whiteLinesY += 100;
+                }
+
+                //Move the white lines down the screen to create the illusion of movement
+                whiteLineMovement += 5;
+
+                //When the white lines move off the screen, reset them to the top
+                if (whiteLineMovement > 100) {
+                    whiteLineMovement = 0;
+                }
+
+                //User car
+                userCar("#bbd8ea");
+
+                //Keep user on road
+                if (userCarX < 75) {
+                    userCarX = 75;
+                }
+
+                if (userCarX > 615) {
+                    userCarX = 615;
+                }
+
+                if (userCarY < 0) {
+                    userCarY = 0;
+                }
+
+                if (userCarY > HEIGHT - 150) {
+                    userCarY = HEIGHT - 150;
+                }
+
+
+                //left side obstacle cars (facing downwards)
+
+                twoWayObstacleCarY += 8;
+
+                if (twoWayObstacleCarY > HEIGHT + 50) {
+
+                    twoWayObstacleCarY = -150;
+
+
+                    twoWayObstacleCarX = leftLanes[Math.floor(Math.random() * leftLanes.length)];
+                }
+
+                twoWayObstacleCar2Y += 8;
+
+                if (twoWayObstacleCar2Y > HEIGHT + 50) {
+
+                    twoWayObstacleCar2Y = -250;
+
+
+                    twoWayObstacleCar2X = leftLanes[Math.floor(Math.random() * leftLanes.length)];
+                }
+
+
+                //right side obstacle cars (facing upwards)
+                twoWayObstacleCar3Y -= 7;
+
+                if (twoWayObstacleCar3Y < -200) {
+
+                    // Spawn from bottom
+                    twoWayObstacleCar3Y = HEIGHT + 150;
+
+
+                    twoWayObstacleCar3X = rightLanes[Math.floor(Math.random() * rightLanes.length)];
+                }
+
+                twoWayObstacleCar4Y -= 9;
+
+                if (twoWayObstacleCar4Y < -200) {
+
+                    // Spawn from bottom
+                    twoWayObstacleCar4Y = HEIGHT + 150;
+
+
+                    twoWayObstacleCar4X = rightLanes[Math.floor(Math.random() * rightLanes.length)];
+                }
+
+                //Draw cars
+
+                //left side
+                obstacleCars(twoWayObstacleCarX, twoWayObstacleCarY, "#ffffff", true);
+                obstacleCars(twoWayObstacleCar2X, twoWayObstacleCar2Y, "#ff0000", true);
+
+                //right side
+                obstacleCars(twoWayObstacleCar3X, twoWayObstacleCar3Y, "#000000", false);
+                obstacleCars(twoWayObstacleCar4X, twoWayObstacleCar4Y, "#800080", false);
+
+                //Check collisions with all 4 cars
+                if (
+                        checkCollision(userCarX, userCarY,
+                                twoWayObstacleCarX, twoWayObstacleCarY) ||
+                        checkCollision(userCarX, userCarY,
+                                twoWayObstacleCar2X, twoWayObstacleCar2Y) ||
+                        checkCollision(userCarX, userCarY,
+                                twoWayObstacleCar3X, twoWayObstacleCar3Y) ||
+                        checkCollision(userCarX, userCarY,
+                                twoWayObstacleCar4X, twoWayObstacleCar4Y)
+                        ) {
+                    //Go to game over screen
+                    gameState = "game over two way";
+                }
+                //Score increases as time goes on
+                score += 0.1;
+                //Display score
+                scoreTracker();
+            }
+
+            function userCar(color) {
+
+
+                drawer.fillStyle = "#000000";
+                roundRect(userCarX - 5, userCarY + 25, 15, 30, 15);//Top left wheel
+                roundRect(userCarX + 80, userCarY + 25, 15, 30, 15);//Top right wheel
+                roundRect(userCarX - 5, userCarY + 100, 15, 30, 15);//Bottoom left wheel
+                roundRect(userCarX + 80, userCarY + 100, 15, 30, 15);//Bottom right wheel
+
+                //Main Car body
+                drawer.fillStyle = color;
+                roundRect(userCarX, userCarY, 90, 150, 15);
+
+                //Windows
+                drawer.fillStyle = "#000000";
+                roundRect(userCarX + 5, userCarY + 35, 80, 95, 25);
+
+                //The roof
+                drawer.fillStyle = color;
+                roundRect(userCarX + 15, userCarY + 50, 60, 60, 15);
+
+                //Front lights
+                drawer.fillStyle = "#d9cc1e";
+                circle(userCarX + 12, userCarY + 10, 7, 7);
+                circle(userCarX + 78, userCarY + 10, 7, 7);
+
+
+                //Allows user to move left right up and down with the WASD keys
+                if (userCarMovingLeft === true) {
+
+                    //Move car left
+                    userCarX -= 7;
+
+                } else if (userCarMovingRight === true) {
+                    //move car right
+                    userCarX += 7;
+                }
+
+                if (userCarMovingUp === true) {
+                    //Move car up
+                    userCarY -= 7;
+                } else if (userCarMovingDown === true) {
+                    //move car down
+                    userCarY += 7;
+                }
+
+
+
+
+            }
+
+            function obstacleCars(x, y, color, facingDown) {
+
+                // Wheels
+                drawer.fillStyle = "#000000";
+                roundRect(x - 5, y + 25, 15, 30, 15);
+                roundRect(x + 80, y + 25, 15, 30, 15);
+                roundRect(x - 5, y + 100, 15, 30, 15);
+                roundRect(x + 80, y + 100, 15, 30, 15);
+
+                // Main body
+                drawer.fillStyle = color;
+                roundRect(x, y, 90, 150, 15);
+
+                // Windows
+                drawer.fillStyle = "#000000";
+                roundRect(x + 5, y + 35, 80, 95, 25);
+
+                // Roof
+                drawer.fillStyle = color;
+                roundRect(x + 15, y + 50, 60, 60, 15);
+
+                if (facingDown === true) {
+
+                    // Tail lights at top
+                    drawer.fillStyle = "#ff0000";
+                    circle(x + 12, y + 10, 7);
+                    circle(x + 78, y + 10, 7);
+
+                    // Headlights at bottom
+                    drawer.fillStyle = "#d9cc1e";
+                    circle(x + 12, y + 140, 7);
+                    circle(x + 78, y + 140, 7);
+
+                } else {
+
+                    // Normal headlights at top
+                    drawer.fillStyle = "#d9cc1e";
+                    circle(x + 12, y + 10, 7);
+                    circle(x + 78, y + 10, 7);
+
+                    // Tail lights at bottom
+                    drawer.fillStyle = "#ff0000";
+                    circle(x + 12, y + 140, 7);
+                    circle(x + 78, y + 140, 7);
+                }
+            }
+
+            function checkCollision(x1, y1, x2, y2) {
+
+                //Car width = 90
+                //Car height = 150;
+
+                //Check collision with cars
+                if (x1 < x2 + 90 && x1 + 90 > x2 && y1 < y2 + 150 && y1 + 150 > y2) {
+                    //return true if there is a collision
+                    return true;
+
+                }
+                //return false if there is no collision
+                return false;
+            }
+
+            function scoreTracker() {
+
+                //Score Text
+                drawer.font = "40px Arial";
+                drawer.fillStyle = "#000000";
+
+                //Use math floor so that score is a whole number instead of a decimal
+                drawer.fillText("Score: " + Math.floor(score), 300, 100);
+
+            }
+
+
+
+
+            function gameOver() {
+
+                //Background
+                drawer.fillStyle = "#345299";
+                rect(0, 0, WIDTH, HEIGHT);
+
+                drawer.fillStyle = "#ffffff";
+                roundRect(100, 200, 600, 200, 25);
+
+                //Game Over text
+                drawer.fillStyle = "#000000";
+                drawer.font = "50px Arial";
+                drawer.fillText("Game Over!", 265, 315);
+
+                drawer.fillStyle = "#ffffff";
+                drawer.font = "50px Arial";
+                drawer.fillText("Final Score: " + Math.floor(score), 200, 385);
+
+                // Final Score text
+                drawer.fillStyle = "#e63946";
+                drawer.font = "40px Arial";
+                drawer.fillText("Final Score: " + Math.floor(score), 270, 450);
+
+                //Go back to main menu
+                drawer.strokeStyle = "#000000";
+                drawer.lineWidth = 5;
+                drawer.fillStyle = "#ffffff";
+                rect(20, 20, 150, 50);
+                drawer.strokeRect(20, 20, 150, 50);
+                drawer.fillStyle = "#000000";
+                drawer.font = "20px Arial";
+                drawer.fillText("Back to Menu", 32, 53);
+
+                //Restart
+                drawer.strokeStyle = "#000000";
+                drawer.lineWidth = 5;
+                drawer.fillStyle = "#ffffff";
+                rect(660, 20, 100, 50);
+                drawer.strokeRect(660, 20, 100, 50);
+                drawer.fillStyle = "#000000";
+                drawer.font = "20px Arial";
+                drawer.fillText("Restart", 675, 53);
+
+
+            }
+
+            function howToPlay() {
+
+                //Staring Message
                 startingMessage();
 
-            } else if (gameState === "how to play") {
 
-                howToPlay();
-
-            } else if (gameState === "second screen") {
-
-                secondScreen();
-
-            } else if (gameState === "one way screen game") {
-
-                oneWayScreenGame();
-
-            } else if (gameState === "two way screen game") {
-
-                twoWayScreenGame();
-
-            } else if (gameState === "game over one way") {
-
-                gameOver();
-
-            } else if (gameState === "game over two way") {
-
-                gameOver();
-            }
-
-
-            //TODO CODE MAIN GAME HERE
-            //Some tips:
-            //1. Use functions to break it down
-            //2. Use a game state variable to track what phase the game is in
-            //3. Comment your code as you go along
-            //re run this function (i.e. make it loop)
-            requestAnimationFrame(draw);
-        }
-
-
-
-
-        function startingMessage() {
-
-            //background
-            drawer.fillStyle = "#345299";
-            rect(0, 0, WIDTH, HEIGHT);
-
-
-
-            //Starting Message
-            drawer.fillStyle = "#ffffff";
-            drawer.font = "50px Arial";
-            drawer.fillText("Welcome to Legend Racing", 100, 300);
-
-
-
-            //Click here to begin game button
-            rect(100, 350, 610, 100);
-            drawer.fillStyle = "#000000";
-            drawer.font = "35px Arial";
-            drawer.fillText("Click Here to begin", 258, 410);
-
-
-            //How to play tab
-            drawer.strokeStyle = "#000000";
-            drawer.lineWidth = 5;
-            drawer.fillStyle = "#ffffff";
-            rect(30, 500, 135, 50);
-            drawer.strokeRect(30, 500, 135, 50);
-            drawer.fillStyle = "#000000";
-            drawer.font = "20px Arial";
-            drawer.fillText("How to play", 44, 530);
-
-
-        }
-
-        function secondScreen() {
-
-            //background
-            drawer.fillStyle = "#345299";
-            rect(0, 0, WIDTH, HEIGHT);
-
-            //Two game modes
-            drawer.fillStyle = "#ffffff"
-            rect(150, 200, 200, 200);
-            rect(450, 200, 200, 200);
-            drawer.font = "30px Arial";
-            drawer.fillText("One Way", 190, 435);
-            drawer.fillText("Two Way", 490, 435);
-            drawer.drawImage(twoWaySign, 450, 210, 200, 180);
-            drawer.drawImage(oneWaySign, 150, 210, 200, 180);
-
-            //Go back to starting screen
-            drawer.strokeStyle = "#000000";
-            drawer.lineWidth = 5;
-            rect(20, 20, 150, 50);
-            drawer.strokeRect(20, 20, 150, 50);
-            drawer.fillStyle = "#000000";
-            drawer.font = "20px Arial";
-            drawer.fillText("Back to Menu", 32, 53);
-
-
-        }
-
-
-        function oneWayScreenGame() {
-            //Colour backgroud blue
-            drawer.fillStyle = "#345299";
-            rect(0, 0, WIDTH, HEIGHT);
-
-
-
-            //Background
-            drawer.fillStyle = "#1f8c3c"
-            rect(0, 0, WIDTH, HEIGHT);
-            drawer.fillStyle = "#46484a";
-            rect(75, 0, 630, 600);
-
-
-
-            //White lines on road
-            var whiteLinesY = whiteLineMovement;
-            for (var i = 0; i < 10; i++) {
-
+                //A pop up box that shows the commands
                 drawer.fillStyle = "#ffffff";
-                rect(185, whiteLinesY, 20, 50);
-                rect(315, whiteLinesY, 20, 50);
-                rect(445, whiteLinesY, 20, 50);
-                rect(575, whiteLinesY, 20, 50);
-                whiteLinesY += 100;
+                rect(100, 80, 620, 400);
+                drawer.fillStyle = "#000000";
+                drawer.font = "30px Arial";
+                drawer.fillText("How to play", 330, 120);
+
+                //4 Key images used to play the game
+                drawer.drawImage(wKeyImg, 170, 200, 100, 100);
+                drawer.drawImage(aKeyImg, 290, 200, 100, 100);
+                drawer.drawImage(sKeyImg, 410, 200, 100, 100);
+                drawer.drawImage(dKeyImg, 530, 200, 100, 100);
+                drawer.font = "20px Arial";
+
+                //Control descriptions
+                drawer.fillText("Move Up", 180, 325);
+                drawer.fillText("Move Left", 300, 325);
+                drawer.fillText("Move Right", 410, 325);
+                drawer.fillText("Move Down", 530, 325);
 
 
 
             }
-            //Move the white lines down the screen to create the illusion of movement
-            whiteLineMovement += 5;
 
-            //When the white lines move off the screen, reset them to the top
-            if (whiteLineMovement > 100) {
-                whiteLineMovement = 0;
+
+            //==========================DRAWING HELPERS=========================
+            //there are many more drawing commands available: https://www.w3schools.com/jsref/api_canvas.asp
+
+            //this function draws a circle centered at x,y with a radius of r
+            function circle(x, y, r) {
+                drawer.beginPath();
+                //Math.PI is 180 degrees
+                drawer.arc(x, y, r, 0, Math.PI * 2, true);
+                drawer.closePath();
+                drawer.fill();
             }
 
 
-            //The user's car
-            userCar("#bbd8ea");
-
-            //Keep the user's car on the road
-            if (userCarX < 75) {
-                userCarX = 75;
-            }
-            if (userCarX > 625) {
-                userCarX = 625;
-            }
-            if (userCarY < 0) {
-                userCarY = 0;
-            }
-            if (userCarY > HEIGHT - 80) {
-                userCarY = HEIGHT - 80;
-            }
-
-            // car 1
-            obstacleCarY += 5;
-
-            //when car goes off screen, reset it to the top with a random lane
-            if (obstacleCarY > HEIGHT + 50) {
-                obstacleCarY = -150;
-
-                // Pick a random lane index from 0 to 4
-                var pickLane1 = Math.floor(Math.random() * laneChoices.length);
-                obstacleCarX = laneChoices[pickLane1]; // Assigns the exact lane position
+            //this function draws a rectangle with the top left corner at x,y
+            //and a width of w and a height of h
+            function rect(x, y, w, h) {
+                drawer.beginPath();
+                drawer.rect(x, y, w, h);
+                drawer.closePath();
+                drawer.fill();
             }
 
 
-            // car 2
-            obstacleCar2Y += 7;
+            //this function draws an ellipse centered at x,y with a horizontal radius of w and a vertical radius of h 
+            function ellipse(x, y, w, h) {
+                drawer.beginPath();
+                drawer.ellipse(x, y, w, h, 0, 0, Math.PI * 2);
+                drawer.closePath();
+                drawer.fill();
+            }
 
-            if (obstacleCar2Y > HEIGHT + 50) {
-                obstacleCar2Y = -200;
+            //this function draws a triangle with the three points at x1,y1, x2,y2, and x3,y3
+            function triangle(x1, y1, x2, y2, x3, y3) {
+                drawer.beginPath();
+                drawer.moveTo(x1, y1);
+                drawer.lineTo(x2, y2);
+                drawer.lineTo(x3, y3);
+                drawer.closePath();
+                drawer.fill();
+            }
 
-                var pickLane2 = Math.floor(Math.random() * laneChoices.length);
-                obstacleCar2X = laneChoices[pickLane2];
+            //this function draws a line from x1,y1 to x2,y2
+            function line(x1, y1, x2, y2) {
+                drawer.beginPath();
+                drawer.moveTo(x1, y1);
+                drawer.lineTo(x2, y2);
+                drawer.closePath();
+                drawer.stroke();
             }
 
 
-            // car 3
-            obstacleCar3Y += 10;
-
-            if (obstacleCar3Y > HEIGHT + 50) {
-                obstacleCar3Y = -200;
-
-                var pickLane3 = Math.floor(Math.random() * laneChoices.length);
-                obstacleCar3X = laneChoices[pickLane3];
-            }
-
-
-            // car 4
-            obstacleCar4Y += 11;
-
-            if (obstacleCar4Y > HEIGHT + 50) {
-                obstacleCar4Y = -250;
-
-                var pickLane4 = Math.floor(Math.random() * laneChoices.length);
-                obstacleCar4X = laneChoices[pickLane4];
-            }
-
-
-
-
-            //draw obstacle cars
-            obstacleCars(obstacleCarX, obstacleCarY, "#ffffff", false);
-            obstacleCars(obstacleCar2X, obstacleCar2Y, "#ff0000", false);
-            obstacleCars(obstacleCar3X, obstacleCar3Y, "#000000", false);
-            obstacleCars(obstacleCar4X, obstacleCar4Y, "#800080", false);
-
-            //Check collisions
-
-            if (
-                checkCollision(userCarX, userCarY, obstacleCarX, obstacleCarY) ||
-                checkCollision(userCarX, userCarY, obstacleCar2X, obstacleCar2Y) ||
-                checkCollision(userCarX, userCarY, obstacleCar3X, obstacleCar3Y) ||
-                checkCollision(userCarX, userCarY, obstacleCar4X, obstacleCar4Y)) {
-
-                gameState = "game over one way";
-            }
-
-
-            //Score increases as time goes on
-            score += 0.1;
-            //Display score
-            scoreTracker();
-
-        }
-
-
-        function twoWayScreenGame() {
-
-            //Colour background blue
-            drawer.fillStyle = "#345299";
-            rect(0, 0, WIDTH, HEIGHT);
-
-            //The back button
-            drawer.strokeStyle = "#000000";
-            drawer.lineWidth = 5;
-            drawer.fillStyle = "#ffffff";
-            rect(20, 20, 150, 50);
-            drawer.strokeRect(20, 20, 150, 50);
-            drawer.fillStyle = "#000000";
-            drawer.font = "20px Arial";
-            drawer.fillText("Back to Menu", 32, 53);
-
-            //Background
-            drawer.fillStyle = "#1f8c3c";
-            rect(0, 0, WIDTH, HEIGHT);
-
-            drawer.fillStyle = "#46484a";
-            rect(75, 0, 630, 600);
-
-            //Yellow road divider
-            drawer.fillStyle = "#ffff00";
-            rect(387, 0, 6, HEIGHT);
-
-            //White lane lines
-            var whiteLinesY = whiteLineMovement;
-
-            for (var i = 0; i < 10; i++) {
-
-                drawer.fillStyle = "#ffffff";
-
-                //Draw 4 sets of white lines to divide the lanes
-                rect(170, whiteLinesY, 15, 50);
-                rect(275, whiteLinesY, 15, 50);
-                rect(485, whiteLinesY, 15, 50);
-                rect(590, whiteLinesY, 15, 50);
-
-                whiteLinesY += 100;
-            }
-
-            //Move the white lines down the screen to create the illusion of movement
-            whiteLineMovement += 5;
-
-            //When the white lines move off the screen, reset them to the top
-            if (whiteLineMovement > 100) {
-                whiteLineMovement = 0;
-            }
-
-            //User car
-            userCar("#bbd8ea");
-
-            //Keep user on road
-            if (userCarX < 75) {
-                userCarX = 75;
-            }
-
-            if (userCarX > 615) {
-                userCarX = 615;
-            }
-
-            if (userCarY < 0) {
-                userCarY = 0;
-            }
-
-            if (userCarY > HEIGHT - 150) {
-                userCarY = HEIGHT - 150;
-            }
-
-
-            //left side obstacle cars (facing downwards)
-
-            twoWayObstacleCarY += 8;
-
-            if (twoWayObstacleCarY > HEIGHT + 50) {
-
-                twoWayObstacleCarY = -150;
-
-                
-                twoWayObstacleCarX = leftLanes[Math.floor(Math.random() * leftLanes.length)];
-            }
-
-            twoWayObstacleCar2Y += 8;
-
-            if (twoWayObstacleCar2Y > HEIGHT + 50) {
-
-                twoWayObstacleCar2Y = -250;
-
-                
-                twoWayObstacleCar2X = leftLanes[Math.floor(Math.random() * leftLanes.length)];
-            }
-
-
-            //right side obstacle cars (facing upwards)
-            twoWayObstacleCar3Y -= 7;
-
-            if (twoWayObstacleCar3Y < -200) {
-
-                // Spawn from bottom
-                twoWayObstacleCar3Y = HEIGHT + 150;
-
-                
-                twoWayObstacleCar3X = rightLanes[Math.floor(Math.random() * rightLanes.length)];
-            }
-
-            twoWayObstacleCar4Y -= 9;
-
-            if (twoWayObstacleCar4Y < -200) {
-
-                // Spawn from bottom
-                twoWayObstacleCar4Y = HEIGHT + 150;
-
-                
-                twoWayObstacleCar4X = rightLanes[Math.floor(Math.random() * rightLanes.length)];
-            }
-
-            //Draw cars
-
-            //left side
-            obstacleCars(twoWayObstacleCarX, twoWayObstacleCarY, "#ffffff", true);
-            obstacleCars(twoWayObstacleCar2X, twoWayObstacleCar2Y, "#ff0000", true);
-
-            //right side
-            obstacleCars(twoWayObstacleCar3X, twoWayObstacleCar3Y, "#000000", false);
-            obstacleCars(twoWayObstacleCar4X, twoWayObstacleCar4Y, "#800080", false);
-
-            //Check collisions with all 4 cars
-            if (
-                checkCollision(userCarX, userCarY,
-                    twoWayObstacleCarX, twoWayObstacleCarY) ||
-
-                checkCollision(userCarX, userCarY,
-                    twoWayObstacleCar2X, twoWayObstacleCar2Y) ||
-
-                checkCollision(userCarX, userCarY,
-                    twoWayObstacleCar3X, twoWayObstacleCar3Y) ||
-
-                checkCollision(userCarX, userCarY,
-                    twoWayObstacleCar4X, twoWayObstacleCar4Y)
-            ) {
-                //Go to game over screen
-                gameState = "game over two way";
-            }
-            //Score increases as time goes on
-            score += 0.1;
-            //Display score
-            scoreTracker();
-        }
-
-        function userCar(color) {
-
-
-            drawer.fillStyle = "#000000";
-            roundRect(userCarX - 5, userCarY + 25, 15, 30, 15);//Top left wheel
-            roundRect(userCarX + 80, userCarY + 25, 15, 30, 15);//Top right wheel
-            roundRect(userCarX - 5, userCarY + 100, 15, 30, 15);//Bottoom left wheel
-            roundRect(userCarX + 80, userCarY + 100, 15, 30, 15);//Bottom right wheel
-
-            //Main Car body
-            drawer.fillStyle = color;
-            roundRect(userCarX, userCarY, 90, 150, 15);
-
-            //Windows
-            drawer.fillStyle = "#000000";
-            roundRect(userCarX + 5, userCarY + 35, 80, 95, 25);
-
-            //The roof
-            drawer.fillStyle = color;
-            roundRect(userCarX + 15, userCarY + 50, 60, 60, 15);
-
-            //Front lights
-            drawer.fillStyle = "#d9cc1e";
-            circle(userCarX + 12, userCarY + 10, 7, 7);
-            circle(userCarX + 78, userCarY + 10, 7, 7);
-
-
-            //Allows user to move left right up and down with the WASD keys
-            if (userCarMovingLeft === true) {
-
-                //Move car left
-                userCarX -= 7;
-
-            } else if (userCarMovingRight === true) {
-                //move car right
-                userCarX += 7;
-            }
-
-            if (userCarMovingUp === true) {
-                //Move car up
-                userCarY -= 7;
-            } else if (userCarMovingDown === true) {
-                //move car down
-                userCarY += 7;
-            }
-
-
-
-
-        }
-
-        function obstacleCars(x, y, color, facingDown) {
-
-            // Wheels
-            drawer.fillStyle = "#000000";
-            roundRect(x - 5, y + 25, 15, 30, 15);
-            roundRect(x + 80, y + 25, 15, 30, 15);
-            roundRect(x - 5, y + 100, 15, 30, 15);
-            roundRect(x + 80, y + 100, 15, 30, 15);
-
-            // Main body
-            drawer.fillStyle = color;
-            roundRect(x, y, 90, 150, 15);
-
-            // Windows
-            drawer.fillStyle = "#000000";
-            roundRect(x + 5, y + 35, 80, 95, 25);
-
-            // Roof
-            drawer.fillStyle = color;
-            roundRect(x + 15, y + 50, 60, 60, 15);
-
-            if (facingDown === true) {
-
-                // Tail lights at top
-                drawer.fillStyle = "#ff0000";
-                circle(x + 12, y + 10, 7);
-                circle(x + 78, y + 10, 7);
-
-                // Headlights at bottom
-                drawer.fillStyle = "#d9cc1e";
-                circle(x + 12, y + 140, 7);
-                circle(x + 78, y + 140, 7);
-
-            } else {
-
-                // Normal headlights at top
-                drawer.fillStyle = "#d9cc1e";
-                circle(x + 12, y + 10, 7);
-                circle(x + 78, y + 10, 7);
-
-                // Tail lights at bottom
-                drawer.fillStyle = "#ff0000";
-                circle(x + 12, y + 140, 7);
-                circle(x + 78, y + 140, 7);
-            }
-        }
-
-        function checkCollision(x1, y1, x2, y2) {
-
-            //Car width = 90
-            //Car height = 150;
-
-            //Check collision with cars
-            if (x1 < x2 + 90 && x1 + 90 > x2 && y1 < y2 + 150 && y1 + 150 > y2) {
-                //return true if there is a collision
-                return true;
-
-            }
-//return false if there is no collision
-            return false;
-        }
-
-        function scoreTracker() {
-
-            //Score Text
-            drawer.font = "40px Arial";
-            drawer.fillStyle = "#000000";
-
-            //Use math floor so that score is a whole number instead of a decimal
-            drawer.fillText("Score: " + Math.floor(score), 300, 100);
-
-        }
-
-
-
-
-        function gameOver() {
-
-            //Background
-            drawer.fillStyle = "#345299";
-            rect(0, 0, WIDTH, HEIGHT);
-
-            drawer.fillStyle = "#ffffff";
-            roundRect(100, 200, 600, 200, 25);
-
-            //Game Over text
-            drawer.fillStyle = "#000000";
-            drawer.font = "50px Arial";
-            drawer.fillText("Game Over!", 265, 315);
-
-            drawer.fillStyle = "#ffffff";
-            drawer.font = "50px Arial";
-            drawer.fillText("Final Score: " + Math.floor(score), 200, 385);
-
-            // Final Score text
-            drawer.fillStyle = "#e63946";
-            drawer.font = "40px Arial";
-            drawer.fillText("Final Score: " + Math.floor(score), 270, 450);
-
-            //Go back to main menu
-            drawer.strokeStyle = "#000000";
-            drawer.lineWidth = 5;
-            drawer.fillStyle = "#ffffff";
-            rect(20, 20, 150, 50);
-            drawer.strokeRect(20, 20, 150, 50);
-            drawer.fillStyle = "#000000";
-            drawer.font = "20px Arial";
-            drawer.fillText("Back to Menu", 32, 53);
-
-            //Restart
-            drawer.strokeStyle = "#000000";
-            drawer.lineWidth = 5;
-            drawer.fillStyle = "#ffffff";
-            rect(660, 20, 100, 50);
-            drawer.strokeRect(660, 20, 100, 50);
-            drawer.fillStyle = "#000000";
-            drawer.font = "20px Arial";
-            drawer.fillText("Restart", 675, 53);
-
-
-        }
-
-        function howToPlay() {
-
-            //Staring Message
-            startingMessage();
-
-
-            //A pop up box that shows the commands
-            drawer.fillStyle = "#ffffff";
-            rect(100, 80, 620, 400);
-            drawer.fillStyle = "#000000";
-            drawer.font = "30px Arial";
-            drawer.fillText("How to play", 330, 120);
-
-            //4 Key images used to play the game
-            drawer.drawImage(wKeyImg, 170, 200, 100, 100);
-            drawer.drawImage(aKeyImg, 290, 200, 100, 100);
-            drawer.drawImage(sKeyImg, 410, 200, 100, 100);
-            drawer.drawImage(dKeyImg, 530, 200, 100, 100);
-            drawer.font = "20px Arial";
-
-            //Control descriptions
-            drawer.fillText("Move Up", 180, 325);
-            drawer.fillText("Move Left", 300, 325);
-            drawer.fillText("Move Right", 410, 325);
-            drawer.fillText("Move Down", 530, 325);
-
-
-
-        }
-
-
-        //==========================DRAWING HELPERS=========================
-        //there are many more drawing commands available: https://www.w3schools.com/jsref/api_canvas.asp
-
-        //this function draws a circle centered at x,y with a radius of r
-        function circle(x, y, r) {
-            drawer.beginPath();
-            //Math.PI is 180 degrees
-            drawer.arc(x, y, r, 0, Math.PI * 2, true);
-            drawer.closePath();
-            drawer.fill();
-        }
-
-
-        //this function draws a rectangle with the top left corner at x,y
-        //and a width of w and a height of h
-        function rect(x, y, w, h) {
-            drawer.beginPath();
-            drawer.rect(x, y, w, h);
-            drawer.closePath();
-            drawer.fill();
-        }
-
-
-        //this function draws an ellipse centered at x,y with a horizontal radius of w and a vertical radius of h 
-        function ellipse(x, y, w, h) {
-            drawer.beginPath();
-            drawer.ellipse(x, y, w, h, 0, 0, Math.PI * 2);
-            drawer.closePath();
-            drawer.fill();
-        }
-
-        //this function draws a triangle with the three points at x1,y1, x2,y2, and x3,y3
-        function triangle(x1, y1, x2, y2, x3, y3) {
-            drawer.beginPath();
-            drawer.moveTo(x1, y1);
-            drawer.lineTo(x2, y2);
-            drawer.lineTo(x3, y3);
-            drawer.closePath();
-            drawer.fill();
-        }
-
-        //this function draws a line from x1,y1 to x2,y2
-        function line(x1, y1, x2, y2) {
-            drawer.beginPath();
-            drawer.moveTo(x1, y1);
-            drawer.lineTo(x2, y2);
-            drawer.closePath();
-            drawer.stroke();
-        }
-
-
-        //obtained from Google AI
-
-        //It is a rectangle with rouneded edges
-        function roundRect(x, y, w, h, r) {
-
-            drawer.beginPath();
-            drawer.roundRect(x, y, w, h, r);
-            drawer.closePath();
-            drawer.fill();
-
-        }
-
-        //fills the screen with black (i.e. erases everything)
-        function clear() {
-            drawer.fillStyle = "#000000"; //black
-            rect(0, 0, WIDTH, HEIGHT);
-        }
-        //==================================================================
-
-
-        //===========================USER INPUT=============================
-        //this function runs when a key is pressed down
-        function onKeyDown(evt) {
-            //check which key is pressed
-            //maybe update some global variables?
-            //other codes can be found here:https://www.toptal.com/developers/keycode
-            if (evt.keyCode === 87) {
-                console.log("W KEY IS DOWN");
-                userCarMovingUp = true;
-
-            }
-            if (evt.keyCode === 83) {
-                console.log("S KEY IS DOWN");
-                userCarMovingDown = true;
+            //obtained from Google AI
+
+            //It is a rectangle with rouneded edges
+            function roundRect(x, y, w, h, r) {
+
+                drawer.beginPath();
+                drawer.roundRect(x, y, w, h, r);
+                drawer.closePath();
+                drawer.fill();
 
             }
 
-            if (evt.keyCode === 65) {
-                console.log("A KEY IS DOWN");
-                userCarMovingLeft = true;
+            //fills the screen with black (i.e. erases everything)
+            function clear() {
+                drawer.fillStyle = "#000000"; //black
+                rect(0, 0, WIDTH, HEIGHT);
+            }
+            //==================================================================
 
+
+            //===========================USER INPUT=============================
+            //this function runs when a key is pressed down
+            function onKeyDown(evt) {
+                //check which key is pressed
+                //maybe update some global variables?
+                //other codes can be found here:https://www.toptal.com/developers/keycode
+                if (evt.keyCode === 87) {
+                    console.log("W KEY IS DOWN");
+                    userCarMovingUp = true;
+
+                }
+                if (evt.keyCode === 83) {
+                    console.log("S KEY IS DOWN");
+                    userCarMovingDown = true;
+
+                }
+
+                if (evt.keyCode === 65) {
+                    console.log("A KEY IS DOWN");
+                    userCarMovingLeft = true;
+
+                }
+
+                if (evt.keyCode === 68) {
+                    console.log("D KEY IS DOWN");
+                    userCarMovingRight = true;
+                }
+                if (evt.keyCode === 38) {
+                    console.log("UP ARROW KEY IS DOWN");
+                }
+                if (evt.keyCode === 40) {
+                    console.log("DOWN ARROW KEY IS DOWN");
+                }
+                if (evt.keyCode === 32) {
+                    console.log("SPACE KEY IS DOWN");
+                }
             }
 
-            if (evt.keyCode === 68) {
-                console.log("D KEY IS DOWN");
-                userCarMovingRight = true;
-            }
-            if (evt.keyCode === 38) {
-                console.log("UP ARROW KEY IS DOWN");
-            }
-            if (evt.keyCode === 40) {
-                console.log("DOWN ARROW KEY IS DOWN");
-            }
-            if (evt.keyCode === 32) {
-                console.log("SPACE KEY IS DOWN");
-            }
-        }
+            //this function runs when a key is released
+            function onKeyUp(evt) {
+                //check which key is released
+                //maybe update some global variables?
+                //other codes can be found here:https://www.toptal.com/developers/keycode
+                if (evt.keyCode === 87) {
+                    console.log("W KEY IS UP");
+                    userCarMovingUp = false;
+                }
+                if (evt.keyCode === 83) {
+                    console.log("S KEY IS UP");
+                    userCarMovingDown = false;
+                }
 
-        //this function runs when a key is released
-        function onKeyUp(evt) {
-            //check which key is released
-            //maybe update some global variables?
-            //other codes can be found here:https://www.toptal.com/developers/keycode
-            if (evt.keyCode === 87) {
-                console.log("W KEY IS UP");
-                userCarMovingUp = false;
-            }
-            if (evt.keyCode === 83) {
-                console.log("S KEY IS UP");
-                userCarMovingDown = false;
-            }
+                if (evt.keyCode === 65) {
+                    console.log("A KEY IS UP");
+                    userCarMovingLeft = false;
+                }
+                if (evt.keyCode === 68) {
+                    console.log("D KEY IS UP");
 
-            if (evt.keyCode === 65) {
-                console.log("A KEY IS UP");
-                userCarMovingLeft = false;
-            }
-            if (evt.keyCode === 68) {
-                console.log("D KEY IS UP");
-
-                userCarMovingRight = false;
-            }
-            if (evt.keyCode === 38) {
-                console.log("UP ARROW KEY IS UP");
-            }
-            if (evt.keyCode === 40) {
-                console.log("DOWN ARROW KEY IS UP");
-            }
-            if (evt.keyCode === 32) {
-                console.log("SPACE KEY IS UP");
-            }
-        }
-
-
-        function handleMouseDown(event) {
-
-            isMouseDown = true;
-
-            //Get the mouse position
-            const rect = drawer.canvas.getBoundingClientRect();
-            var mouseX = event.clientX - rect.left;
-            var mouseY = event.clientY - rect.top;
-
-            
-            //When the user clicks on the how to play button, move it to the how to play screen
-            if (isMouseDown && gameState === "main menu" && mouseX >= 30 && mouseX <= 165 && mouseY >= 500 && mouseY <= 550) {
-                setTimeout(function () {
-                    gameState = "how to play";
-                }, 100);
-            }
-            //When the user clicks on the how to play button in the how to play screen, move it back to the main menu
-            if (isMouseDown && gameState === "how to play" && mouseX >= 30 && mouseX <= 165 && mouseY >= 500 && mouseY <= 550) {
-                setTimeout(function () {
-                    gameState = "main menu";
-                }, 100);
+                    userCarMovingRight = false;
+                }
+                if (evt.keyCode === 38) {
+                    console.log("UP ARROW KEY IS UP");
+                }
+                if (evt.keyCode === 40) {
+                    console.log("DOWN ARROW KEY IS UP");
+                }
+                if (evt.keyCode === 32) {
+                    console.log("SPACE KEY IS UP");
+                }
             }
 
-            //When the user clicks on the click here to start button, move it to the second screen
-            if (isMouseDown && gameState === "main menu" && mouseX > 100 && mouseX < 710 && mouseY > 350 && mouseY < 450) {
-                setTimeout(function () {
-                    gameState = "second screen";
-                }, 100);
+
+            function handleMouseDown(event) {
+
+                isMouseDown = true;
+
+                //Get the mouse position
+                const rect = drawer.canvas.getBoundingClientRect();
+                var mouseX = event.clientX - rect.left;
+                var mouseY = event.clientY - rect.top;
+
+                //The Set timeout function was aquired from google. //It is used to create a delay before the game state changes, this way the user can see the button being clicked before the screen changes
+
+                //When the user clicks on the how to play button, move it to the how to play screen
+                if (isMouseDown && gameState === "main menu" && mouseX >= 30 && mouseX <= 165 && mouseY >= 500 && mouseY <= 550) {
+                    setTimeout(function () {
+                        gameState = "how to play";
+                    }, 100);
+                }
+                //When the user clicks on the how to play button in the how to play screen, move it back to the main menu
+                if (isMouseDown && gameState === "how to play" && mouseX >= 30 && mouseX <= 165 && mouseY >= 500 && mouseY <= 550) {
+
+
+                    setTimeout(function () {
+                        gameState = "main menu";
+                    }, 100);
+                }
+
+                //When the user clicks on the click here to start button, move it to the second screen
+                if (isMouseDown && gameState === "main menu" && mouseX > 100 && mouseX < 710 && mouseY > 350 && mouseY < 450) {
+                    setTimeout(function () {
+                        gameState = "second screen";
+                    }, 100);
+                }
+
+                //When the user clicks on the back to menu button in the second screen, move it back to the main menu
+                if (isMouseDown && gameState === "second screen" && mouseX > 20 && mouseX < 170 && mouseY > 20 && mouseY < 70) {
+                    setTimeout(function () {
+                        gameState = "main menu";
+                    }, 100);
+                }
+
+                //When the user clicks on the one way button, start the one way game while on the scecond screen
+                if (isMouseDown && gameState === "second screen" && mouseX > 150 && mouseX < 350 && mouseY > 200 && mouseY < 400) {
+                    setTimeout(function () {
+                        gameState = "one way screen game";
+                    }, 100);
+                }
+
+                //Check to see if the two way mode button is clicked in the second screen, and move it too that game mode
+                if (isMouseDown && gameState === "second screen" && mouseX > 450 && mouseX < 650 && mouseY > 200 && mouseY < 400) {
+                    setTimeout(function () {
+
+                        gameState = "two way screen game";
+                    }, 100);
+                }
+
+
+                if (
+                        // Check if the back to menu button is clicked in the game over screen
+                        isMouseDown &&
+                        (gameState === "game over one way" || gameState === "game over two way") &&
+                        mouseX > 20 && mouseX < 170 && mouseY > 20 && mouseY < 70
+                        ) {
+                    setTimeout(function () {
+                        // Reset all variables to their starting values
+                        score = 0;
+
+                        obstacleCarY = -150;
+                        obstacleCar2Y = -200;
+                        obstacleCar3Y = -350;
+                        obstacleCar4Y = -400;
+
+                        twoWayObstacleCarX = leftLanes[Math.floor(Math.random() * leftLanes.length)];
+                        twoWayObstacleCarY = -150;
+
+                        twoWayObstacleCar2X = leftLanes[Math.floor(Math.random() * leftLanes.length)];
+                        twoWayObstacleCar2Y = -200;
+
+                        twoWayObstacleCar3X = rightLanes[Math.floor(Math.random() * rightLanes.length)];
+                        twoWayObstacleCar3Y = 900;
+
+                        twoWayObstacleCar4X = rightLanes[Math.floor(Math.random() * rightLanes.length)];
+                        twoWayObstacleCar4Y = 1300;
+
+                        userCarX = 350;
+                        userCarY = 300;
+
+                        gameState = "main menu";
+
+                    }, 100);
+                }
+
+
+                if (
+                        // Check if the restart button is clicked in the game over screen for one way mode
+                        isMouseDown &&
+                        gameState === "game over one way" &&
+                        mouseX > 660 && mouseX < 760 && mouseY > 20 && mouseY < 70
+                        ) {
+                    setTimeout(function () {
+
+                        // Reset all variables to their starting values
+                        score = 0;
+
+                        obstacleCarY = -150;
+                        obstacleCar2Y = -200;
+                        obstacleCar3Y = -350;
+                        obstacleCar4Y = -400;
+
+                        twoWayObstacleCarX = leftLanes[Math.floor(Math.random() * leftLanes.length)];
+                        twoWayObstacleCarY = -150;
+
+                        twoWayObstacleCar2X = leftLanes[Math.floor(Math.random() * leftLanes.length)];
+                        twoWayObstacleCar2Y = -200;
+
+                        twoWayObstacleCar3X = rightLanes[Math.floor(Math.random() * rightLanes.length)];
+                        twoWayObstacleCar3Y = 900;
+
+                        twoWayObstacleCar4X = rightLanes[Math.floor(Math.random() * rightLanes.length)];
+                        twoWayObstacleCar4Y = 1300;
+
+                        userCarX = 350;
+                        userCarY = 300;
+
+                        gameState = "one way screen game";
+
+                    }, 100);
+                }
+
+                if (
+                        // Check if the restart button is clicked in the game over screen for two way mode
+                        isMouseDown &&
+                        gameState === "game over two way" &&
+                        mouseX > 660 && mouseX < 760 && mouseY > 20 && mouseY < 70
+                        ) {
+                    setTimeout(function () {
+
+                        // Reset all variables to their starting values
+                        score = 0;
+
+                        obstacleCarY = -150;
+                        obstacleCar2Y = -200;
+                        obstacleCar3Y = -350;
+                        obstacleCar4Y = -400;
+
+                        twoWayObstacleCarX = leftLanes[Math.floor(Math.random() * leftLanes.length)];
+                        twoWayObstacleCarY = -150;
+
+                        twoWayObstacleCar2X = leftLanes[Math.floor(Math.random() * leftLanes.length)];
+                        twoWayObstacleCar2Y = -200;
+
+                        twoWayObstacleCar3X = rightLanes[Math.floor(Math.random() * rightLanes.length)];
+                        twoWayObstacleCar3Y = 900;
+
+                        twoWayObstacleCar4X = rightLanes[Math.floor(Math.random() * rightLanes.length)];
+                        twoWayObstacleCar4Y = 1300;
+
+                        userCarX = 350;
+                        userCarY = 300;
+
+                        gameState = "two way screen game";
+
+                    }, 100);
+                }
             }
+            function handleMouseUp(event) {
 
-            //When the user clicks on the back to menu button in the second screen, move it back to the main menu
-            if (isMouseDown && gameState === "second screen" && mouseX > 20 && mouseX < 170 && mouseY > 20 && mouseY < 70) {
-                setTimeout(function () {
-                    gameState = "main menu";
-                }, 100);
+                isMouseDown = false;
+
+
             }
-
-            //When the user clicks on the one way button, start the one way game while on the scecond screen
-            if (isMouseDown && gameState === "second screen" && mouseX > 150 && mouseX < 350 && mouseY > 200 && mouseY < 400) {
-                setTimeout(function () {
-                    gameState = "one way screen game";
-                }, 100);
-            }
-
-            //Check to see if the two way mode button is clicked in the second screen, and move it too that game mode
-            if (isMouseDown && gameState === "second screen" && mouseX > 450 && mouseX < 650 && mouseY > 200 && mouseY < 400) {
-                setTimeout(function () {
-                    
-                    gameState = "two way screen game";
-                }, 100);
-            }
-
-           
-            if (
-                // Check if the back to menu button is clicked in the game over screen
-                isMouseDown &&
-                (gameState === "game over one way" || gameState === "game over two way") &&
-                mouseX > 20 && mouseX < 170 && mouseY > 20 && mouseY < 70
-            ) {
-                setTimeout(function () {
-                    // Reset all variables to their starting values
-                    score = 0;
-
-                    obstacleCarY = -150;
-                    obstacleCar2Y = -200;
-                    obstacleCar3Y = -350;
-                    obstacleCar4Y = -400;
-
-                    twoWayObstacleCarY = -150;
-                    twoWayObstacleCar2Y = -200;
-                    twoWayObstacleCar3Y = 900;
-                    twoWayObstacleCar4Y = 1300;
-
-                    userCarX = 350;
-                    userCarY = 300;
-
-                    gameState = "main menu";
-
-                }, 100);
-            }
-
-            
-            if (
-                // Check if the restart button is clicked in the game over screen for one way mode
-                isMouseDown &&
-                gameState === "game over one way" &&
-                mouseX > 660 && mouseX < 760 && mouseY > 20 && mouseY < 70
-            ) {
-                setTimeout(function () {
-
-                    // Reset all variables to their starting values
-                    score = 0;
-
-                    obstacleCarY = -150;
-                    obstacleCar2Y = -200;
-                    obstacleCar3Y = -350;
-                    obstacleCar4Y = -400;
-
-                    twoWayObstacleCarY = -150;
-                    twoWayObstacleCar2Y = -200;
-                    twoWayObstacleCar3Y = 900;
-                    twoWayObstacleCar4Y = 1300;
-
-                    userCarX = 350;
-                    userCarY = 300;
-
-                    gameState = "one way screen game";
-
-                }, 100);
-            }
-
-            if (
-                // Check if the restart button is clicked in the game over screen for two way mode
-                isMouseDown &&
-                gameState === "game over two way" &&
-                mouseX > 660 && mouseX < 760 && mouseY > 20 && mouseY < 70
-            ) {
-                setTimeout(function () {
-
-                    // Reset all variables to their starting values
-                    score = 0;
-
-                    obstacleCarY = -150;
-                    obstacleCar2Y = -200;
-                    obstacleCar3Y = -350;
-                    obstacleCar4Y = -400;
-
-                    twoWayObstacleCarY = -150;
-                    twoWayObstacleCar2Y = -200;
-                    twoWayObstacleCar3Y = 900;
-                    twoWayObstacleCar4Y = 1300;
-
-                    userCarX = 350;
-                    userCarY = 300;
-
-                    gameState = "two way screen game";
-
-                }, 100);
-            }
-        }
-        function handleMouseUp(event) {
-
-            isMouseDown = false;
+            //==================================================================
 
 
-        }
-        //==================================================================
+            //===========================SETUP CODE=============================
+            //give the canvas focus so that key presses register
+            document.getElementById('canvas').focus();
+            //call the init function when the page loads, it will then start the main game loop
+            window.addEventListener("load", init, false);
+            //call the key press functions when keys are pressed
+            window.addEventListener("keydown", onKeyDown, false);
+            window.addEventListener("keyup", onKeyUp, false);
+            window.addEventListener("mousedown", handleMouseDown);
+            window.addEventListener("mouseup", handleMouseUp);
+            //==================================================================
+        </script>
 
 
-        //===========================SETUP CODE=============================
-        //give the canvas focus so that key presses register
-        document.getElementById('canvas').focus();
-        //call the init function when the page loads, it will then start the main game loop
-        window.addEventListener("load", init, false);
-        //call the key press functions when keys are pressed
-        window.addEventListener("keydown", onKeyDown, false);
-        window.addEventListener("keyup", onKeyUp, false);
-        window.addEventListener("mousedown", handleMouseDown);
-        window.addEventListener("mouseup", handleMouseUp);
-        //==================================================================
-    </script>
-
-
-</body>
+    </body>
 
 
 </html>
